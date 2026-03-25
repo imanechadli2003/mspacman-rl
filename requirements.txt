@@ -1,0 +1,8 @@
+gymnasium[atari]==0.29.1
+ale-py==0.8.1
+torch==2.2.0
+numpy==1.26.4
+matplotlib==3.8.0
+stable-baselines3==2.3.0
+opencv-python==4.9.0.80
+pandas==2.2.0

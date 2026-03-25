@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+
+# Modèles sauvegardés (trop lourds pour git)
+*.pt
+*.pth
+*.zip
+
+# IDE
+.vscode/
+.idea/
