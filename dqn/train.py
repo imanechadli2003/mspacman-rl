@@ -370,6 +370,7 @@ def train():
     current_learning_starts = BATCH_SIZE if total_env_steps > 0 else LEARNING_STARTS
     recent_scores = []
     losses_list   = []
+    episode_idx = episode
 
     print(f" Début | eps={episode_epsilon(episode+1):.3f} | device={DEVICE}")
     try:
@@ -380,6 +381,7 @@ def train():
             state, _  = env.reset()
             ep_reward  = 0.0
             ep_score   = 0.0
+            ep_trophy_score = 0.0
             ep_steps   = 0
             dots_manges    = 0
             ghosts_eaten   = 0
@@ -404,8 +406,11 @@ def train():
                 done = term or trunc
 
                 raw_reward = float(info.get("raw_reward", reward))
-                if raw_reward > 0:     dots_manges  += 1
-                if raw_reward >= 200:  ghosts_eaten += 1
+                ghost_points = float(info.get("ghost_points", 0.0))
+                dot_count = int(info.get("dot_count", 0))
+                dots_manges += dot_count
+                if ghost_points > 0:
+                    ghosts_eaten += 1
 
                 # Push avec episode_id si Trophy Buffer actif
                 if _trophy_active() :
@@ -418,7 +423,8 @@ def train():
 
                 state      = next_state
                 ep_reward += reward
-                ep_score  += raw_reward
+                ep_score += raw_reward
+                ep_trophy_score += raw_reward - 0.80 * ghost_points
                 ep_steps  += 1
                 total_env_steps += 1
 
@@ -474,28 +480,29 @@ def train():
             # Fin d'épisode : Trophy Buffer boost + mise à jour baseline
             # ------------------------------------------------------------------
             if _trophy_active():
-                if ep_score > trophy_baseline + TROPHY_MIN_DELTA:
+                if ep_trophy_score > trophy_baseline + TROPHY_MIN_DELTA:
                     result = replay_buffer.boost_episode_priorities(
                         episode_id=episode_idx,
-                        total_return=ep_score,
+                        total_return=ep_trophy_score,
                         baseline=trophy_baseline,
                         lambda_boost=TROPHY_LAMBDA
                     )
+                    
                     if result is not None:
                         n_boosted, boost_factor = result
                         print(
                             f"\033[96m[TROPHY] Ep {episode_idx} | "
-                            f"score={ep_score:.0f} > baseline={trophy_baseline:.0f} | "
+                            f"score={ep_trophy_score:.0f} > baseline={trophy_baseline:.0f} | "
                             f"boost=×{boost_factor:.3f} sur {n_boosted} transitions\033[0m"
                         )
 
                 # Mise à jour EMA de la baseline (toujours, trophy ou pas)
                 if trophy_baseline == 0.0:
-                    trophy_baseline = ep_score
+                    trophy_baseline = ep_trophy_score
                 else:
                     trophy_baseline = (
                         (1 - TROPHY_BASELINE_ALPHA) * trophy_baseline
-                        + TROPHY_BASELINE_ALPHA * ep_score
+                        + TROPHY_BASELINE_ALPHA * ep_trophy_score
                     )
 
             # ------------------------------------------------------------------
