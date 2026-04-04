@@ -12,3 +12,12 @@ __pycache__/
 # IDE
 .vscode/
 .idea/
+
+# Documentation générée par Doxygen
+docs/html/
+docs/latex/
+Doxyfile
+
+#dqn
+*.mp4
+log.json
