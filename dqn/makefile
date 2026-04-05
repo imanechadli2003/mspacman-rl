@@ -187,10 +187,12 @@ import json, os; \
 data = json.load(open('$(LOG_FILE)')); \
 keys = sorted(data.keys(), key=lambda k: int(k.split('_')[-1])); \
 n = len(keys); \
+dots = [data[k].get('dots', 0) for k in keys]; \
 scores = [data[k].get('score', 0) for k in keys]; \
 last = data[keys[-1]] if keys else {}; \
 print(f'  Episodes    : {n}'); \
 print(f'  Best score  : {max(scores):.0f}'); \
+print(f'  max-dots    : {max(dots):.0f}'); \
 print(f'  Last score  : {last.get(\"score\", 0):.0f}'); \
 print(f'  Last loss   : {last.get(\"loss\", 0):.4f}'); \
 print(f'  Last eps    : {last.get(\"eps\", last.get(\"epsilon\", 0)):.4f}'); \
