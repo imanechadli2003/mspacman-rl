@@ -227,7 +227,7 @@ list-backups:
 .PHONY: install
 install:
 	@echo "$(GREEN)[INSTALL] Installation des dependances...$(RESET)"
-	pip install torch torchvision numpy gymnasium ale-py matplotlib imageio
+	pip install torch torchvision numpy gymnasium ale-py matplotlib imageio Pillow
 	@echo "$(GREEN)[INSTALL] Dependances installees$(RESET)"
 
 ##
@@ -258,7 +258,7 @@ import numpy; print(f'  NumPy      : {numpy.__version__}'); \
 .PHONY: clean
 clean:
 	@echo "$(YELLOW)[CLEAN] Nettoyage checkpoint et logs...$(RESET)"
-	@read -p "Supprimer $(n)/mspacman_dqn.pth et $(LOG_FILE) ? [y/N] " CONFIRM; \
+	@read -p "Supprimer $(CKPT_DIR)/mspacman_dqn.pth et $(LOG_FILE) ? [y/N] " CONFIRM; \
 	if [ "$$CONFIRM" = "y" ] || [ "$$CONFIRM" = "Y" ]; then \
 		rm -f $(CKPT_DIR)/mspacman_dqn.pth; \
 		rm -f $(LOG_FILE); \
